@@ -7,6 +7,7 @@ const route2 = (req, res) => {
 }
 
 app.get('/user',userAuth, (req, res, next) => {
+    throw new Error('not audio enable')
     console.log('callling next ererto addd another router handelr')
     next()
 }, route2)
@@ -24,7 +25,10 @@ app.get('/query', (req, res) => {
     res.send(req.query)
 })
 
-app.use('/', (req, res) => {
+app.use('/', (err,req, res,next) => {
+    if(err){
+        res.status(500).send('something went wrong')
+    }
     res.send('no route match fro u')
 })
 
