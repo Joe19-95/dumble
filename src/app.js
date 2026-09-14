@@ -1,11 +1,29 @@
 const express = require("express")
 const app = express()
 
-app.use('/test',(req, res) => {
-    res.send('hello fromnn server')
-})
-app.listen(3000, () => {
-    console.log('server connected suucessfully')
+
+app.get('/user', (req, res) => {
+    res.send({ name: 'joe', lname: 'jacob' })
 })
 
-// added test comit
+app.post('/user', (req, res) => {
+    res.send('post data succeffule')
+})
+
+
+app.get('/params/:id/:name', (req, res) => {
+    res.send(req.params)
+})
+app.get('/query', (req, res) => {
+    res.send(req.query)
+})
+
+app.use('/', (req, res) => {
+    res.send('no route match fro u')
+})
+
+
+
+app.listen(3000, () => {
+    console.log('server statrt ok')
+})
