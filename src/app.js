@@ -50,23 +50,9 @@ app.post('/signUp', async (req, res) => {
     }
 })
 
-app.get('/getUser', async (req, res) => {
+app.get('/getUser', userAuth, async (req, res) => {
     try {
-        const cookie = req.cookies
-        if (!cookie.token) {
-            throw new Error('token is not valid')
-        }
-        const decoded = await jwt.verify(cookie.token, "JOE19")
-        console.log(decoded._id)
-        const user = await User.findById(decoded._id)
-        if (!user) {
-            throw new Error('user does not exits')
-        }
-        if (user.length === 0) {
-            res.status(404).send('user not found')
-        } else {
-            res.send(user)
-        }
+        res.send(req.user)
     } catch (err) {
         res.status(500).send('something went wrong' + err.message)
     }
