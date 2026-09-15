@@ -3,14 +3,38 @@ const express = require("express")
 const { addUserValid } = require('./utils/addUserValidator')
 const { connectDB } = require('./config/database')
 const User = require('./models/user')
+const bcrypt = require('bcrypt')
 const app = express()
 app.use(express.json())
+
+app.post('/login', async (req, res) => {
+    try {
+        const { email, password } = req.body
+        const user = await User.findOne({ email: email })
+        if (!user) {
+            throw new Error('Invalid Creds')
+        }
+        const isValid = await bcrypt(password, user.password)
+        if (isValid) {
+            res.send('Login ok')
+        } else {
+            throw new Error("Invalid creds")
+        }
+
+    } catch (err) {
+        res.status(500).send('invalid creds')
+    }
+})
 
 app.post('/addUser', async (req, res) => {
     console.log(req.body)
     try {
+        //add data valdaitor for the data that user enter
         addUserValid(req.body)
-        const user = new User(req.body)
+        // add password encrption to srote password safelu in db
+        const { fname, lname, email, password } = req.body
+        const pasHash = await bcrypt(password, 10)
+        const user = new User({ fname, lname, email, password: pasHash })
         await user.save()
         res.send('user added ok')
 
