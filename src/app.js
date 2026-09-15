@@ -1,5 +1,6 @@
 const { userAuth } = require("./middlewares/auth")
 const express = require("express")
+const { addUserValid } = require('./utils/addUserValidator')
 const { connectDB } = require('./config/database')
 const User = require('./models/user')
 const app = express()
@@ -8,6 +9,7 @@ app.use(express.json())
 app.post('/addUser', async (req, res) => {
     console.log(req.body)
     try {
+        addUserValid(req.body)
         const user = new User(req.body)
         await user.save()
         res.send('user added ok')
