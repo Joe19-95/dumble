@@ -4,18 +4,24 @@ const { addUserValid } = require('./utils/addUserValidator')
 const { connectDB } = require('./config/database')
 const User = require('./models/user')
 const bcrypt = require('bcrypt')
+const cookieParser = require('cookie-parser')
+const jwt = require('jsonwebtoken')
 const app = express()
 app.use(express.json())
+app.use(cookieParser())
 
 app.post('/login', async (req, res) => {
     try {
         const { email, password } = req.body
         const user = await User.findOne({ email: email })
+        console.log(user)
         if (!user) {
             throw new Error('Invalid Creds')
         }
-        const isValid = await bcrypt(password, user.password)
+        const isValid = await bcrypt.compare(password, user.password)
         if (isValid) {
+            const token = await jwt.sign({ _id: user._id }, "JOE19")
+            res.cookie("token", token)
             res.send('Login ok')
         } else {
             throw new Error("Invalid creds")
@@ -26,14 +32,15 @@ app.post('/login', async (req, res) => {
     }
 })
 
-app.post('/addUser', async (req, res) => {
+app.post('/signUp', async (req, res) => {
     console.log(req.body)
+
     try {
         //add data valdaitor for the data that user enter
         addUserValid(req.body)
         // add password encrption to srote password safelu in db
         const { fname, lname, email, password } = req.body
-        const pasHash = await bcrypt(password, 10)
+        const pasHash = await bcrypt.hash(password, 10)
         const user = new User({ fname, lname, email, password: pasHash })
         await user.save()
         res.send('user added ok')
@@ -45,15 +52,23 @@ app.post('/addUser', async (req, res) => {
 
 app.get('/getUser', async (req, res) => {
     try {
-        const name = req.body.fname
-        const user = await User.find({ fname: name })
+        const cookie = req.cookies
+        if (!cookie.token) {
+            throw new Error('token is not valid')
+        }
+        const decoded = await jwt.verify(cookie.token, "JOE19")
+        console.log(decoded._id)
+        const user = await User.findById(decoded._id)
+        if (!user) {
+            throw new Error('user does not exits')
+        }
         if (user.length === 0) {
             res.status(404).send('user not found')
         } else {
             res.send(user)
         }
     } catch (err) {
-        res.status(500).send('something went wrong')
+        res.status(500).send('something went wrong' + err.message)
     }
 })
 
