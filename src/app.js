@@ -3,15 +3,70 @@ const express = require("express")
 const { connectDB } = require('./config/database')
 const User = require('./models/user')
 const app = express()
+app.use(express.json())
 
-app.post('/signup', async (req, res) => {
-    const user = new User({
-        fname: 'joe',
-        lname: 'jacob',
-        age: '90'
-    })
-    await user.save()
-    res.send('user saved ok')
+app.post('/addUser', async (req, res) => {
+    console.log(req.body)
+    try {
+        const user = new User(req.body)
+        await user.save()
+        res.send('user added ok')
+
+    } catch (err) {
+        res.status(500).send('something went wrong' + err.message)
+    }
+})
+
+app.get('/getUser', async (req, res) => {
+    try {
+        const name = req.body.fname
+        const user = await User.find({ fname: name })
+        if (user.length === 0) {
+            res.status(404).send('user not found')
+        } else {
+            res.send(user)
+        }
+    } catch (err) {
+        res.status(500).send('something went wrong')
+    }
+})
+
+
+app.get('/feed', async (req, res) => {
+    try {
+        const users = await User.find({})
+        res.send(users)
+
+    } catch (err) {
+        res.status(500).send('something went wrong')
+    }
+})
+
+app.delete('/delUser', async (req, res) => {
+    try {
+        const user = await User.findByIdAndDelete(req.body.userId)
+        if (user) {
+            res.send(user)
+        } else {
+            res.status(400).send('user not found')
+        }
+    } catch (err) {
+        res.status(500).send('something went wrong')
+    }
+})
+
+app.patch('/updateUser', async (req, res) => {
+    try {
+        const ALLOWED = ["age", "skills", "userId"]
+        isReqOk = Object.keys(req.body).every(k => ALLOWED.includes(k))
+        if (!isReqOk) {
+            throw new Error('non valid feilds are there in the code')
+        }
+        const user = await User.findByIdAndUpdate({ _id: req.body.userId }, req.body, { returnDocument: "after", runValidators: true })
+        res.send(user)
+    } catch (err) {
+        res.status(500).send('something went wrong' + err.message)
+    }
 })
 
 connectDB().then(() => {
