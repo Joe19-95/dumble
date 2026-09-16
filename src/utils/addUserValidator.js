@@ -10,4 +10,9 @@ const addUserValid = (data) => {
     }
 }
 
-module.exports = { addUserValid }
+const validateEditData = (data) => {
+    const ALLOWED = ['skills', 'photoURL', 'age', 'gender', 'skills']
+    return Object.keys(data).every(k => ALLOWED.includes(k))
+}
+
+module.exports = { addUserValid, validateEditData }
