@@ -9,7 +9,7 @@ router.post('/login', async (req, res) => {
     try {
         const { email, password } = req.body
         const user = await User.findOne({ email: email })
-        console.log(user)
+        // console.log(user)
         if (!user) {
             throw new Error('Invalid Creds')
         }
@@ -28,7 +28,7 @@ router.post('/login', async (req, res) => {
 })
 
 router.post('/signUp', async (req, res) => {
-    console.log(req.body)
+    // console.log(req.body)
     try {
         //add data valdaitor for the data that user enter
         addUserValid(req.body)

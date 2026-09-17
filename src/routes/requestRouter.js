@@ -38,6 +38,35 @@ reqRouter.post('/sendRequest/:status/:toId', userAuth, async (req, res) => {
     }
 
 })
+// localhost:3000/reviewRequest/accepted/6aab9a422baf28a2a50e42f7
+reqRouter.post('/reviewRequest/:status/:connectionReq', userAuth, async (req, res) => {
+    try {
+
+        const loggedUser = req.user
+        const { status, connectionReq } = req.params
+        const ALLOWED = ['accepted', 'rejected']
+        if (!ALLOWED.includes(status)) {
+            throw new Error('ststus sis not valid')
+        }
+        // console.log(loggedUser._id.toString())
+        const connectionRequest = await Connection.findOne({
+            _id: connectionReq,
+            to: loggedUser._id.toString(),
+            status: 'interested'
+        })
+        if (!connectionRequest) {
+            throw new Error('this connection is not valid')
+        }
+        connectionRequest.status = status
+        await connectionRequest.save()
+        res.json({
+            message: 'request status is changed',
+            data: connectionRequest
+        })
+    } catch (err) {
+        res.status(400).send('something went eweonr' + err.message)
+    }
+})
 
 
 
