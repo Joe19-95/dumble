@@ -3,6 +3,7 @@ const userRouter = express.Router()
 const { userAuth } = require("../middlewares/auth")
 const User = require('../models/user')
 const { validateEditData } = require('../utils/addUserValidator')
+const ConnecModel = require('../models/connectionRequest')
 
 
 userRouter.get('/profile/view', userAuth, async (req, res) => {
@@ -33,13 +34,24 @@ userRouter.patch('/profile/edit', userAuth, async (req, res) => {
     }
 })
 
-userRouter.get('/feed', async (req, res) => {
+userRouter.get('/feed', userAuth, async (req, res) => {
     try {
-        const users = await User.find({})
-        res.send(users)
+        const curUser = req.user
+        let connection = await ConnecModel.find({
+            $or: [
+                { from: curUser._id }, { to: curUser._id }
+            ]
+        }).select("from to")
+        const hideId = []
+        connection.forEach(element => {
+            hideId.push(element.from.toString())
+            hideId.push(element.to.toString())
+        });
+        const finalUsers = await User.find({ $and: [{ _id: { $nin: hideId } }, { _id: {$ne: curUser._id }}] }).select('fname lname photoURL age gender skills');
+        res.json({ data: finalUsers })
 
     } catch (err) {
-        res.status(500).send('something went wrong')
+        res.status(500).send('something went wrong' + err.message)
     }
 })
 
