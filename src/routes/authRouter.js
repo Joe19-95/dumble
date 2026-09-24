@@ -17,7 +17,7 @@ router.post('/login', async (req, res) => {
         if (isValid) {
             const token = user.getJWT()
             res.cookie("token", token)
-            res.send('Login ok')
+            res.json({ message: 'login ok', data: user })
         } else {
             throw new Error("Invalid creds")
         }

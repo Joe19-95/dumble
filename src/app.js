@@ -7,8 +7,13 @@ const reqRouter = require('./routes/requestRouter')
 const connectionRouter = require('./routes/connectionRouter');
 const swaggerUi = require('swagger-ui-express')
 const swaggerDocument = require('./swagger')
-
+const cors = require('cors')
 const app = express()
+
+app.use(cors({
+    origin: 'http://localhost:5173',
+    credentials: true
+}))
 app.use(express.json())
 app.use(cookieParser())
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument))

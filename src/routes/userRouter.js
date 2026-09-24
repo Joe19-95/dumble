@@ -37,6 +37,11 @@ userRouter.patch('/profile/edit', userAuth, async (req, res) => {
 userRouter.get('/feed', userAuth, async (req, res) => {
     try {
         const curUser = req.user
+        let page = parseInt(req.query.page) || 1
+        let limit = parseInt(req.query.limit) || 10
+        limit = Math.min(Math.max(limit, 1), 50);
+        page = Math.max(page, 1);
+        let skip = (page - 1) * limit
         let connection = await ConnecModel.find({
             $or: [
                 { from: curUser._id }, { to: curUser._id }
@@ -47,9 +52,8 @@ userRouter.get('/feed', userAuth, async (req, res) => {
             hideId.push(element.from.toString())
             hideId.push(element.to.toString())
         });
-        const finalUsers = await User.find({ $and: [{ _id: { $nin: hideId } }, { _id: {$ne: curUser._id }}] }).select('fname lname photoURL age gender skills');
+        const finalUsers = await User.find({ $and: [{ _id: { $nin: hideId } }, { _id: { $ne: curUser._id } }] }).select('fname lname photoURL age gender skills').skip(skip).limit(limit)
         res.json({ data: finalUsers })
-
     } catch (err) {
         res.status(500).send('something went wrong' + err.message)
     }
