@@ -11,7 +11,7 @@ const addUserValid = (data) => {
 }
 
 const validateEditData = (data) => {
-    const ALLOWED = ['skills', 'photoURL', 'age', 'gender', 'skills']
+ const ALLOWED = ['fname', 'lname','skills', 'photoURL', 'age', 'gender', 'skills']
     return Object.keys(data).every(k => ALLOWED.includes(k))
 }
 
