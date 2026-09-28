@@ -3,6 +3,7 @@ const reqRouter = express.Router()
 const { userAuth } = require('../middlewares/auth')
 const User = require('../models/user')
 const Connection = require('../models/connectionRequest')
+const { run } = require('../utils/sendEmail')
 
 // localhost:3000/sendRequest/intrested/6aab9236c95a43f76bfc9113
 
@@ -32,6 +33,8 @@ reqRouter.post('/sendRequest/:status/:toId', userAuth, async (req, res) => {
             status
         })
         await newCon.save()
+        const sendEmailResult = await run()
+        console.log('sendEmailResult', sendEmailResult)
         res.json({ message: 'connetion sent ok', data: newCon })
     } catch (err) {
         res.status(400).send('something went wrong' + err.message)
