@@ -33,8 +33,8 @@ reqRouter.post('/sendRequest/:status/:toId', userAuth, async (req, res) => {
             status
         })
         await newCon.save()
-        const sendEmailResult = await run()
-        console.log('sendEmailResult', sendEmailResult)
+        // const sendEmailResult = await run()
+        // console.log('sendEmailResult', sendEmailResult)
         res.json({ message: 'connetion sent ok', data: newCon })
     } catch (err) {
         res.status(400).send('something went wrong' + err.message)
