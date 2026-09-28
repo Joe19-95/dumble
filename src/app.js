@@ -1,4 +1,5 @@
 const express = require("express")
+require('dotenv').config()
 const { connectDB } = require('./config/database')
 const cookieParser = require('cookie-parser')
 const authRouter = require('./routes/authRouter')
@@ -24,6 +25,7 @@ app.use('/', reqRouter)
 app.use('/', connectionRouter);
 
 connectDB().then(() => {
+    console.log(process.env.AWS_ACCESS_KEY_ID, process.env.AWS_SECRET_ACCESS_KEY)
     console.log('db connection ok')
     app.listen(3000, () => {
         console.log('server statrt ok')
