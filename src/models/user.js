@@ -12,6 +12,19 @@ const userSchema = mongoose.Schema({
         type: String,
         required: true
     },
+    isPremium: {
+        type: Boolean,
+        default: false
+    },
+    membershipType: {
+        type: String,
+        default: 'silver',
+        validate(val) {
+            if (!['silver', 'gold'].includes(val)) {
+                throw new Error('membership type is not valid')
+            }
+        }
+    },
     email: {
         type: String,
         required: true,
