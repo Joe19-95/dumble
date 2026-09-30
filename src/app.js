@@ -15,6 +15,7 @@ require('./utils/cron')
 const http = require('http')
 const socket = require('socket.io')
 const initSocket = require("./utils/socket")
+const chatRouter = require("./routes/chatRouter")
 app.use(cors({
     origin: 'http://localhost:5173',
     credentials: true
@@ -29,6 +30,7 @@ app.use('/', userRouter)
 app.use('/', reqRouter)
 app.use('/', connectionRouter);
 app.use('/', paymentRouter);
+app.use('/', chatRouter)
 
 const server = http.createServer(app)
 initSocket(server)
