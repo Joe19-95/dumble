@@ -1,6 +1,6 @@
 const cron = require('node-cron')
 const Connection = require('../models/connectionRequest')
-const { subDays, startOfDay, endOfDay } = require('date-fns/subDays')
+const { subDays, startOfDay, endOfDay } = require('date-fns')
 const { run } = require('./sendEmail')
 
 cron.schedule('0 8 * * *', async () => {
