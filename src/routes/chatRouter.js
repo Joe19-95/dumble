@@ -3,12 +3,12 @@ const chatRouter = express.Router()
 const Chat = require('../models/chat')
 const { userAuth } = require('../middlewares/auth')
 
-chatRouter.get('chat/:to', userAuth, async (req, res) => {
+chatRouter.get('/chat/:to', userAuth, async (req, res) => {
     const { to } = req.params
     const from = req.user._id
     try {
         let chat = await Chat.findOne({
-            participants: { 
+            participants: {
                 $all: [from, to]
             }
         }).populate({
@@ -24,7 +24,8 @@ chatRouter.get('chat/:to', userAuth, async (req, res) => {
         await chat.save()
         res.json(chat)
     } catch (err) {
-        console.log(err)
+        console.error('Unable to load chat', err)
+        res.status(500).send('Unable to load chat')
     }
 })
 

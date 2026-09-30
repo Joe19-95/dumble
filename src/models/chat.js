@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 const messageSchema = mongoose.Schema({
-    senderId: {
+    from: {
         type: mongoose.Schema.Types.ObjectId,
         required: true,
         ref: "User"
@@ -20,4 +20,4 @@ const chatSchema = new mongoose.Schema({
 }, { timestamps: true })
 
 const chatModel = mongoose.model('chat', chatSchema)
-module.export = chatModel
+module.exports = chatModel

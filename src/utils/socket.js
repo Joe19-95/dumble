@@ -4,7 +4,7 @@ const Chat = require('../models/chat')
 const initSocket = (server) => {
     const io = socket(server, {
         cors: {
-            origin: 'http://localhost/5173'
+            origin: 'http://localhost:5173'
         }
     })
 
@@ -19,7 +19,7 @@ const initSocket = (server) => {
             console.log(`sendime mesafe to${roomId} and messafe ${text}`)
 
             try {
-                let chat = await Chat.find({
+                let chat = await Chat.findOne({
                     participants: {
                         $all: [from, to]
                     }
@@ -31,11 +31,12 @@ const initSocket = (server) => {
                     })
                 }
                 chat.messages.push({ from: from, text: text })
-                chat.save()
+                await chat.save()
                 io.to(roomId).emit("newMessage", { fname, from, text })
 
             } catch (err) {
-                res.status(500).send('something went wrong' + err)
+                console.error('Unable to save chat message', err)
+                socket.emit('chatError', { message: 'Unable to save chat message' })
             }
         })
         socket.on('disconnect', () => { })
