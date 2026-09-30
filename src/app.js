@@ -12,11 +12,14 @@ const swaggerDocument = require('./swagger')
 const cors = require('cors')
 const app = express()
 require('./utils/cron')
-
+const http = require('http')
+const socket = require('socket.io')
+const initSocket = require("./utils/socket")
 app.use(cors({
     origin: 'http://localhost:5173',
     credentials: true
 }))
+
 app.use(express.json())
 app.use(cookieParser())
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
@@ -27,10 +30,12 @@ app.use('/', reqRouter)
 app.use('/', connectionRouter);
 app.use('/', paymentRouter);
 
+const server = http.createServer(app)
+initSocket(server)
+
 connectDB().then(() => {
-    console.log(process.env.AWS_ACCESS_KEY_ID, process.env.AWS_SECRET_ACCESS_KEY)
     console.log('db connection ok')
-    app.listen(3000, () => {
+    server.listen(3000, () => {
         console.log('server statrt ok')
     })
 }).catch(() => {
